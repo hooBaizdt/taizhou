@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no, email=no">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="mobileSelect/lib/mobileSelect.css">
+<script type="text/javascript" src="mobileSelect/lib/mobileSelect.js"></script>
+<title>添加宝宝</title>
+</head>
+<body>
+<h3 class="form-remark">完善孩子资料，享受更多服务</h3>
+<section>
+	<ul class="form-row">
+		<li>
+			<label>宝宝姓名</label>
+			<div><input type="text" placeholder="请输入您孩子的姓名" class="name"></div>
+			
+		</li>
+		<li class="form-time">
+			<label>出生日期</label>
+			<div style="position: relative;">
+					<span id="select_1" class="birth">选择出生日期</span>
+			</div>
+		</li>
+		<li>
+			<label>母亲姓名</label>
+			<div><input type="text" placeholder="请输入孩子母亲的姓名" class="motherName"></div>
+		</li>
+		<li>
+			<label>档案编号</label>
+			<div><input type="text" placeholder="请输入孩子疫苗本的档案编号" class="fchildno"></div>
+		</li>
+	</ul>
+	<div style="margin: 3rem 1.5rem;"><button class="form-submt">确认添加</button></div>
+</section>
+</body>
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/template-web.js"></script>
+<script src="mobileSelect/selectDate.js"></script>
+<script src="js/getTime.js"></script>
+<script src="js/sha1.js"></script>
+<script src="js/appid.js"></script>
+<script src="layer/layer.js"></script>
+<script>
+var birthday;
+$.selectDate("#select_1",{
+	title:'选择出生日期'
+},function (data) {
+	var year=data.year;
+	var month=data.month;
+	var day=data.day;
+	function p(s) {
+   		return s < 10 ? '0' + s: s;
+	}
+	 birthday=year+"-"+p(month)+"-"+p(data.day);
+});
+
+
+</script>
+<script>
+		var timestamp;	
+		var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
+		var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
+		var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
+		var member_num =$.getUrlParma.getparma('member_num'); 
+		$(".form-submt").on("click",function(){
+			gettime();
+		})
+		function gettime(){
+			timestamp = Math.round(new Date() / 1000)
+			var now=getNow();
+			var signature=app_ID+app_KEY+timestamp+signaturekey;
+			var signatureVal=SHA2(signature);
+			var data={
+				"app_ID":app_ID,
+				"app_KEY":app_KEY,
+				"timestamp":timestamp,
+				"signature":signatureVal,
+			}
+			var thisTime;
+			var name=$(".name").val();
+			var birth=birthday;
+			var mothername=$(".motherName").val();
+			var fchildno=$(".fchildno").val();
+
+			if(name&&birth&&mothername&&fchildno){
+				add()
+			}
+			else{
+				layer.open({
+					content: '请填写完整的儿童信息！'
+					,skin: 'msg'
+				  });
+			}
+
+			function add(){
+				$.ajax({
+				url: $.getServiceUrl.getUrl("token"),
+				type: "GET",
+				datatype: "json",
+				contentType: "application/json; charset=utf-8",
+				headers: {
+					"sid": "123456",
+					"timestamp": now,
+					"content-type": "application/json",
+				},
+				data:data,
+				success: function(data) {
+					var access_token=data.access_token
+					var params=
+					{
+						"head":{
+						"sid": "123456",
+						"timestamp": now
+						},
+						"body":{
+						  "name":name,
+						  "birth":birth,
+						  "mothername":mothername,
+						  "fchildno":fchildno,
+						  "userid":member_num,
+						},
+						"tail":{
+						}
+					}
+					$.ajax({
+						url: $.getServiceUrl.getUrl("url"),
+						type: "POST",
+						headers: {
+							"octopus-apiid": $.appid.getId("addChildren"),
+							"octopus-token": access_token,
+							"content-type": "application/json",
+						},
+						data:JSON.stringify(params),
+						success: function(data) {
+							if(data.err_code="FAIL"){
+								layer.open({
+									content: data.err_code_des
+									,skin: 'msg'
+							   });
+							}
+							else{
+								layer.open({
+									content: "添加成功！"
+									,skin: 'msg'
+							   });
+							}
+							
+						},
+						error: function(data) {
+							layer.open({
+								content: '接口请求失败！'
+								,skin: 'msg'
+							});
+						}
+					})
+				},
+				error: function(data) {
+					console.log("接口请求失败");
+				}
+			})
+			}
+		}
+	</script>
+</html>

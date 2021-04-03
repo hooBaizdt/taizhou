@@ -1,0 +1,287 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no, email=no">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.bootcss.com/Swiper/4.3.0/css/swiper.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/Swiper/4.3.0/js/swiper.min.js"></script>
+    <title>预防接种</title>
+</head>
+<body>
+<section class="ym-child">
+    <div class="ym-c-head">
+        <div class="c-list">
+            <div class="swiper-container">
+                <div class="swiper-wrapper"></div>
+            </div>
+        </div>
+        <div class="c-info">
+            <h3><span id="name"></span><i id="gender"></i><a id="age"></a></h3>
+            <p ><span>出生日期</span><em id="date">暂无信息</em></p>
+            <p ><span>社保信息</span><a  id="withInsurance">暂无信息</a></p>
+            <p ><span>母亲姓名</span><em id="motherName">暂无信息</em></p>
+            <p ><span>档案编号</span><em id="dataNo">暂无信息</em></p>
+        </div>
+    </div>
+    <div class="ym-c-btn">
+        <a class="c-b-fill">接种记录</a><a  class="c-b-line">接种方案</a>
+    </div>
+</section>
+
+</body>
+</html>
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/template-web.js"></script>
+<script src="js/getTime.js"></script>
+<script src="js/sha1.js"></script>
+<script src="js/appid.js"></script>
+<script>
+  window.onload = function () {
+    var timestamp;	
+    var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
+    var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
+    var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
+    function getUrlParam(name) {
+              var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+              var r = window.location.search.substr(1).match(reg); //匹配目标参数
+              if (r != null) return unescape(r[2]); return null; //返回参数值
+      }
+    var member_num = getUrlParam('memberNum'); //用户ID,值是base64后的结果
+    var accessToken= getUrlParam('accessToken')
+    gettime();
+    function gettime(){
+      timestamp = Math.round(new Date() / 1000)
+      var now=getNow();
+      var signature=app_ID+app_KEY+timestamp+signaturekey;
+      var signatureVal=SHA2(signature);
+      var data={
+        "app_ID":app_ID,
+        "app_KEY":app_KEY,
+        "timestamp":timestamp,
+        "signature":signatureVal,
+      }
+      var thisTime;
+      $.ajax({
+            url:  $.getServiceUrl.getUrl("token"),
+            type: "GET",
+            datatype: "json",
+            contentType: "application/json; charset=utf-8",
+            headers: {
+              "sid": "123456",
+              "timestamp": now,
+              "content-type": "application/json",
+            },
+            data:data,
+            success: function(data) {
+              var access_token=data.access_token
+              var params=
+              {
+                "head":{
+                "sid": "123456",
+                "timestamp": now
+                },
+                "body":{
+                   "userid":member_num
+                },
+                "tail":{
+                }
+              }
+              $.ajax({
+                url:  $.getServiceUrl.getUrl("url"),
+                type: "POST",
+                headers: {
+                  "octopus-apiid":  $.appid.getId("childrenList"),
+                  "octopus-token": access_token,
+                  "content-type": "application/json",
+                },
+                data:JSON.stringify(params),
+                success: function(data) {
+                  var lists=data.bindList;
+                  mainSwiper(lists)
+                },
+                error: function(data) {
+                  console.log("接口请求失败");
+                }
+          })
+        },
+            error: function(data) {
+                console.log("接口请求失败");
+            }
+        })
+    }
+     setInterval(gettime,7200000);
+    $(".c-b-fill").on("click",function(){
+      var cardNumber=$("#dataNo").text();
+      window.location.href = "jzjl.html?cardNumber="+cardNumber;
+    })
+    $(".c-b-line").on("click",function(){
+      window.location.href = "ymfa.html";
+    })
+    $(".ym-c-head").on("click",".add",function(){
+      window.location.href = "tjbb.html?member_num="+member_num;
+    })
+    $(".ym-c-head").on("click",".toAddCard",function(){
+      // alert("绑定社保卡");
+      // window.location.href = "/tjbb.html";
+    })
+    
+    // todo 跳转方法未集成
+    // gender 1 男 2 女 年龄需换算
+    // var  lists = [{name:'冯大宝',gender:'1',motherName:'熊小猫',date:'1524639141000',withInsurance:false,dataNo:"3242424"},{name:'冯二宝',gender:'1',motherName:'熊小猫',date:'1332658341000',withInsurance:false,dataNo:"523432432"},{name:'冯三宝',gender:'2',motherName:'熊小猫',date:'1521960741000',withInsurance:false,dataNo:"3243242"},{name:'冯老宝',gender:'2',motherName:'熊小猫',date:'1519541541000',withInsurance:false,dataNo:"3243242"}]
+    // mainSwiper(lists)
+    function mainSwiper (lists) {
+      makeDom()
+      if(lists){
+        initSwiper()
+      }
+      else{
+        console.log(11);
+      }
+      
+      // 设置滑块
+      function makeDom () {
+        var html = ''
+        var wrap = document.querySelector('.swiper-wrapper')
+        if(lists){
+           lists.forEach(function (item) {
+              html+= "<div class='swiper-slide'><a class='c-l-current'><img src='images/head-s@3x.png'></a></div>"
+            })
+            html+="<div class='swiper-slide add'><a class='c-l-current'><img src='images/ym_add_child.png'></a></div>"
+            wrap.innerHTML=html
+        }
+        else{
+            $(".c-b-fill").hide();
+            html+="<div class='swiper-slide add'><a class='c-l-current'><img src='images/ym_add_child.png'></a></div>"
+            wrap.innerHTML=html
+          
+        }
+       
+      }
+      // 设置选择人的信息
+      function chooseUserInfo (index) {
+        var namedom = document.querySelector('#name');
+        var datedom = document.querySelector('#date');
+        var agedom = document.querySelector('#age');
+        var motherNamedom = document.querySelector('#motherName');
+        var dataNodom = document.querySelector('#dataNo')
+        var withInsurancedom = document.querySelector('#withInsurance');
+        var genderdom = document.querySelector('#gender');
+        namedom.innerText= lists[index].name;
+        agedom.innerText= getBetween(lists[index].birth) + '月龄';
+        motherNamedom.innerText= lists[index].mothername;
+        dataNodom.innerText= lists[index].fchildno;
+        datedom.innerText= lists[index].birth;
+        withInsurancedom.innerText= (lists[index].withInsurance)?'社保已关联':'社保未关联';
+        if(!lists[index].withInsurance){
+           $('#withInsurance').addClass("toAddCard");
+        }
+        genderdom.className= lists[index].sex=="男"?'c-i-m':'c-i-f';
+
+      }
+      // 格式化时间
+      function formatTime (time) {
+        var date = new Date(time)
+        var seperator1 = ".";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+          month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+          strDate = "0" + strDate;
+        }
+        var currentdate = year + seperator1 + month + seperator1 + strDate;
+        return currentdate;
+      }
+      // 获取时间差
+      function getBetween (time) {
+        var now = new Date();
+        var nowYear=now.getFullYear();
+        var nowMonth=now.getMonth()+1;
+        var dateYear=parseInt(time.substring(0,4));
+        var dateMonth=parseInt(time.substring(5,7));
+        var nowAge = nowYear*12 + nowMonth;
+        var dateAge = dateYear*12 + dateMonth;
+        var age=nowAge-dateAge;
+        return age;
+      }
+      //初始化 swiper
+      function initSwiper(){
+        var domListArray = [].slice.call(document.querySelectorAll('.swiper-slide'))
+        var mySwiper = new Swiper('.swiper-container', {
+          effect: 'coverflow',
+          observer:true,
+          coverflowEffect: {
+            rotate: 0,
+            stretch: -20,
+            depth: 1000,
+            modifier: 1,
+            slideShadows: false
+          },
+          on:{
+            init(){
+              initShow()
+              chooseUserInfo(this.activeIndex)
+            },
+            transitionEnd: function(){
+              if(this.activeIndex ===  domListArray.length -1){
+                this.slidePrev()
+              }
+              else {
+                chooseUserInfo(this.activeIndex)
+              }
+            },
+            touchStart: function(event){
+              if(domListArray.length > 2)
+              {
+                if(this.activeIndex ===  domListArray.length -2){
+                  this.allowSlideNext = false
+                }
+                else
+                {
+                  this.allowSlideNext = true
+                }
+              }
+              else {
+                this.allowSlideNext = false
+              }
+            },
+            transitionStart:function () {
+              var activeIndex =  this.activeIndex
+              if(activeIndex>=1)
+              {
+                domListArray.forEach(function (item,index) {
+                  item.style.opacity= 0
+                  if(index === activeIndex+1 || index === activeIndex-1 || index === activeIndex )
+                  {
+                    item.style.opacity= 1
+                  }
+                })
+              }
+              else {
+                initShow()
+              }
+            }
+          },
+        })
+        function initShow(){
+          if(domListArray.length > 2)
+          {
+            domListArray.forEach(function (item,index) {
+              item.style.opacity= 1
+              if(index >=2)
+              {
+                item.style.opacity= 0
+              }
+            })
+          }
+        }
+      }
+    }
+  }
+</script>

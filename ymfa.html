@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no, email=no">
+<link rel="stylesheet" href="css/style.css">
+<title>接种方案</title>
+</head>
+
+<body>
+<ul class="ym-tab">
+	<li class="classOne"  value="yi"><a class="ym-tab-current">一类疫苗（免费）</a></li>
+	<li class="classTwo"  value="er"><a class="">二类疫苗（自费）</a></li>
+</ul>
+<section class="ym-list">
+	<div class="classOne"  id="classOne">
+				<table cellpadding="0" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="22%">月龄</th>
+							<th>疫苗名称</th>
+							<th width="20%">剂次</th>
+						</tr>
+					</thead>
+					<tbody id="tableOne">
+					
+					</tbody>
+				</table>
+	</div>
+	<div class="classTwo" id="classTwo">
+			    <div class="ym-li-sm">
+					<p>1&#41; 以下表中疫苗全部为自费疫苗，自愿接种，必须在医生指导下进行</p>
+					<p>2&#41; 以下疫苗仅供参考，因疫苗种类不同，免疫程序有所差别，接种时以疫苗说明书为准</p>
+				</div>
+				<table cellpadding="0" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="22%">月龄</th>
+							<th>疫苗名称</th>
+							<th width="20%">剂次</th>
+						</tr>
+					</thead>
+					<tbody id="tableTwo">
+					
+					</tbody>
+				</table>
+	</div>
+	
+</section>
+</body>
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/template-web.js"></script>
+<script src="js/appid.js"></script>
+<script>
+	
+	function indataOne(){
+		//查询一类疫苗
+		$.ajax({
+                url: $.getServiceUrl.getUrl("ymfa"),
+                type: "post",
+                datatype: "jsonp",
+                data:{
+				  type:"1"
+				},
+                success: function(data) {
+                    creatListOne(data);
+                },
+                error: function(data) {
+                    console.log("接口请求失败");
+                }
+            })
+		
+	}
+	function indataTwo(){
+		$.ajax({
+			url: $.getServiceUrl.getUrl("ymfa"),
+			type: "post",
+			datatype: "jsonp",
+			data:{
+			  type:"2"
+			},
+			success: function(data) {
+				creatListTwo(data);
+			},
+			error: function(data) {
+				console.log("接口请求失败");
+			}
+		})
+	}
+
+	function creatListOne(response){
+        $("#tableOne").html(template("yilei", response));
+    }
+    function creatListTwo(response){
+        $("#tableTwo").html(template("erlei", response));
+    }
+	$(function(){
+        indataOne();
+        indataTwo();
+        $("#classTwo").hide();
+    });
+
+	 /**选择检验报告或者检查报告*/
+	 $(".ym-tab").on("click","li",function(){
+         $(this).find("a").addClass("ym-tab-current").parent("li").siblings("li").find("a").removeClass("ym-tab-current");
+       
+		var value = $(this).attr("value");
+        if(value == "yi"){
+            $("#classTwo").hide();
+            $("#classOne").show();
+        }else{
+            $("#classOne").hide();
+            $("#classTwo").show();
+        }
+
+	 })
+
+
+	 $(".ym-list").on("click",".ymmc",function(){
+		
+		var ymdm=$(this).attr("value");
+		window.location.href = "/ymdetail.html?ymdm="+ymdm;
+	 })
+</script>
+<script type="text/html" id="yilei">
+    {{each data}}
+	    <tr>
+			<td>{{$value.yl}}</td>
+			<td value={{$value.ymdm}} class="ymmc"><a>{{$value.ymmc}}</a></td>
+			<td>第{{$value.jc}}剂</td>
+		</tr>
+    {{/each}}
+</script>
+<script type="text/html" id="erlei">
+    {{each data}}
+           <tr>
+			<td>{{$value.yl}}</td>
+			<td class="ymmc" value={{$value.ymdm}}><a>{{$value.ymmc}}</a></td>
+			<td>第{{$value.jc}}剂</td>
+		</tr>
+    {{/each}}
+</script>
+</html>

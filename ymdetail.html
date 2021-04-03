@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no, email=no">
+<link rel="stylesheet" href="css/style.css">
+<title>疫苗详情</title>
+</head>
+
+<body>
+<section style="position: relative;">
+	<ul class="ym-jilu" id="ymDetail">
+        <h3>疫苗名称:</h3>
+        <p class="ymmc"></p>
+        <h3>预防疾病</h3>
+        <p class="yfjb"> </p>
+        <h3 >接种对象</h3>
+        <p class="jzdx"></p>
+        <h3 >接种方式</h3>
+        <p class="jzfs"></p>
+        <h3>免疫程序</h3>
+        <p class="mycx"></p>
+        <h3>禁忌</h3>
+        <p class="jj"></p>
+        <h3>注意事项</h3>
+        <p class="zysx"></p>
+		
+	</ul>
+	
+</section>
+</body>
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/template-web.js"></script>
+<script src="js/getTime.js"></script>
+<script src="js/sha1.js"></script>
+<script src="js/appid.js"></script>
+<script>
+	var yydm = $.getUrlParma.getparma('ymdm'); 
+	$.ajax({
+                url: $.getServiceUrl.getUrl("ymfaDetail"),
+                type: "post",
+                datatype: "jsonp",
+                data:{
+                    ymdm:yydm
+				},
+                success: function(data) {
+                    var res=data.data;
+                    $(".ymmc").html(res.ymmc);
+                    $(".yfjb").html(res.jbjj);
+                    $(".jzdx").html(res.jzdx);
+                    $(".jzfs").html(res.jzfs);
+                    $(".mycx").html(res.jzcx);
+                    $(".jj").html(res.jj);
+                    $(".zysx").html(res.zysx);
+                },
+                error: function(data) {
+                    console.log("接口请求失败");
+                }
+            })
+
+</script>
+
+</html>

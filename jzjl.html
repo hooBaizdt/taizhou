@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no, email=no">
+<link rel="stylesheet" href="css/style.css">
+<title>接种记录</title>
+</head>
+
+<body>
+<section style="position: relative;">
+	<ul class="ym-jilu" id="jzjlBox">
+		
+		
+	</ul>
+	<div class="ym-line"></div>
+</section>
+</body>
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/template-web.js"></script>
+<script src="js/getTime.js"></script>
+<script src="js/sha1.js"></script>
+<script src="js/appid.js"></script>
+<script type="text/html" id="jzjl">
+	{{each inoculationList}}
+		<li>
+			<div class="ym-time"><i class="ym-t-suc"></i><p class="ym-t-nl"></p> 接种时间：<p class="ym-t-rq">{{$value.fshotdated}}
+				</p></div>
+			<div class="ym-detail">
+				<div class="ym-d-jt"></div>
+				<h2>{{$value.fbactname}}</h2>
+				<!-- <span>（第2剂/共2剂）</span> -->
+				<p><i class="ym-d-dingwei"></i>接种单位：{{$value.ustationname}}</p>
+				<p><i class="ym-d-pihao"></i>疫苗批号：{{$value.ymph}}</p>
+				<p><i class="ym-d-changjia"></i>生产厂家：{{$value.fenterpshortname}}</p>
+			</div>
+		</li>
+	{{/each}}
+</script>
+<script>
+	  function getBetween (time) {
+        var now = new Date();
+        var nowYear=now.getFullYear();
+        var nowMonth=now.getMonth()+1;
+        var dateYear=parseInt(time.substring(0,4));
+        var dateMonth=parseInt(time.substring(5,7));
+        var nowAge = nowYear*12 + nowMonth;
+        var dateAge = dateYear*12 + dateMonth;
+        var age=nowAge-dateAge;
+        return age;
+	  }
+	
+	var timestamp;	
+	var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
+	var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
+	var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
+	var cardNumber =$.getUrlParma.getparma('cardNumber'); 
+	gettime();
+	function gettime(){
+		timestamp = Math.round(new Date() / 1000)
+		var now=getNow();
+		var signature=app_ID+app_KEY+timestamp+signaturekey;
+		var signatureVal=SHA2(signature);
+		var data={
+			"app_ID":app_ID,
+			"app_KEY":app_KEY,
+			"timestamp":timestamp,
+			"signature":signatureVal,
+		}
+		var thisTime;
+		$.ajax({
+	        url: $.getServiceUrl.getUrl("token"),
+	        type: "GET",
+			datatype: "json",
+			contentType: "application/json; charset=utf-8",
+			headers: {
+				"sid": "123456",
+				"timestamp": now,
+				"content-type": "application/json",
+			},
+	        data:data,
+	        success: function(data) {
+				var access_token=data.access_token
+				var params=
+				{
+					"head":{
+					"sid": "123456",
+					"timestamp": now
+					},
+					"body":{
+					//   "fchildno":"331082370120060735"
+					   "fchildno":cardNumber
+					},
+					"tail":{
+					}
+				}
+				$.ajax({
+					url: $.getServiceUrl.getUrl("url"),
+					type: "POST",
+					headers: {
+						"octopus-apiid": $.appid.getId("jzjlList"),
+						"octopus-token": access_token,
+						"content-type": "application/json",
+					},
+					data:JSON.stringify(params),
+					success: function(data) {
+						var res=data.inoculationList;
+						$("#jzjlBox").html(template("jzjl", data));
+					},
+					error: function(data) {
+						console.log("接口请求失败");
+					}
+				})
+			},
+	        error: function(data) {
+	            console.log("接口请求失败");
+	        }
+	    })
+	}
+	 setInterval(gettime,7200000);
+
+</script>
+
+</html>
