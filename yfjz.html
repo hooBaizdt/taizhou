@@ -45,13 +45,7 @@
     var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
     var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
     var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
-    function getUrlParam(name) {
-              var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-              var r = window.location.search.substr(1).match(reg); //匹配目标参数
-              if (r != null) return unescape(r[2]); return null; //返回参数值
-      }
-    var member_num = getUrlParam('memberNum'); //用户ID,值是base64后的结果
-    var accessToken= getUrlParam('accessToken')
+    var member_num = $.getUrlParma.getparma('memberNum'); 
     gettime();
     function gettime(){
       timestamp = Math.round(new Date() / 1000)
@@ -139,7 +133,7 @@
         initSwiper()
       }
       else{
-        console.log(11);
+      
       }
       
       // 设置滑块
