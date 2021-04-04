@@ -39,4 +39,15 @@
 			}
 	}
 
+	$.getNumber={
+		random:function(){
+			var rand = "";
+			for(var i = 0; i < 6; i++){
+				var r = Math.floor(Math.random() * 10);
+				rand += r;
+			}
+			return rand;
+		}
+	}
+
 })(jQuery);

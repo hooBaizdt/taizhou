@@ -58,12 +58,16 @@
 	var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
 	var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
 	var cardNumber =$.getUrlParma.getparma('cardNumber'); 
+	var accessToken =$.getUrlParma.getparma('accessToken'); 
+	var member_num=$.getUrlParma.getparma('member_num'); 
 	gettime();
 	function gettime(){
 		timestamp = Math.round(new Date() / 1000)
 		var now=getNow();
 		var signature=app_ID+app_KEY+timestamp+signaturekey;
 		var signatureVal=SHA2(signature);
+		var random=$.getNumber.random();
+        var sid=member_num+now+random;
 		var data={
 			"app_ID":app_ID,
 			"app_KEY":app_KEY,
@@ -77,9 +81,10 @@
 			datatype: "json",
 			contentType: "application/json; charset=utf-8",
 			headers: {
-				"sid": "123456",
+				"sid":sid,
 				"timestamp": now,
-				"content-type": "application/json",
+				"accessToken":accessToken,
+				"content-type": "application/json"
 			},
 	        data:data,
 	        success: function(data) {
@@ -87,11 +92,10 @@
 				var params=
 				{
 					"head":{
-					"sid": "123456",
+					"sid": sid,
 					"timestamp": now
 					},
 					"body":{
-					//   "fchildno":"331082370120060735"
 					   "fchildno":cardNumber
 					},
 					"tail":{
@@ -101,9 +105,12 @@
 					url: $.getServiceUrl.getUrl("url"),
 					type: "POST",
 					headers: {
+						"sid":sid,
+						"timestamp": now,
+						"accessToken":accessToken,
 						"octopus-apiid": $.appid.getId("jzjlList"),
 						"octopus-token": access_token,
-						"content-type": "application/json",
+						"content-type": "application/json"
 					},
 					data:JSON.stringify(params),
 					success: function(data) {

@@ -46,12 +46,16 @@
     var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
     var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
     var member_num = $.getUrlParma.getparma('memberNum'); 
+    var accessToken = $.getUrlParma.getparma('accessToken');
+
     gettime();
     function gettime(){
       timestamp = Math.round(new Date() / 1000)
       var now=getNow();
       var signature=app_ID+app_KEY+timestamp+signaturekey;
       var signatureVal=SHA2(signature);
+      var random=$.getNumber.random();
+      var sid=member_num+now+random;
       var data={
         "app_ID":app_ID,
         "app_KEY":app_KEY,
@@ -65,17 +69,18 @@
             datatype: "json",
             contentType: "application/json; charset=utf-8",
             headers: {
-              "sid": "123456",
+              "sid": sid,
               "timestamp": now,
+              "accesstoken":accessToken,
               "content-type": "application/json",
             },
             data:data,
-            success: function(data) {
-              var access_token=data.access_token
+            success: function(res) {
+              var access_token=res.access_token
               var params=
               {
                 "head":{
-                "sid": "123456",
+                "sid": sid,
                 "timestamp": now
                 },
                 "body":{
@@ -88,6 +93,9 @@
                 url:  $.getServiceUrl.getUrl("url"),
                 type: "POST",
                 headers: {
+                  "sid": sid,
+                  "timestamp": now,
+                  "accesstoken":accessToken,
                   "octopus-apiid":  $.appid.getId("childrenList"),
                   "octopus-token": access_token,
                   "content-type": "application/json",
@@ -110,17 +118,20 @@
      setInterval(gettime,7200000);
     $(".c-b-fill").on("click",function(){
       var cardNumber=$("#dataNo").text();
-      window.location.href = "jzjl.html?cardNumber="+cardNumber;
+      window.location.href = "jzjl.html?cardNumber="+cardNumber+"&accessToken="+accessToken+"&member_num="+member_num;
     })
     $(".c-b-line").on("click",function(){
       window.location.href = "ymfa.html";
     })
     $(".ym-c-head").on("click",".add",function(){
-      window.location.href = "tjbb.html?member_num="+member_num;
+      window.location.href = "tjbb.html?member_num="+member_num+"&accessToken="+accessToken;
     })
     $(".ym-c-head").on("click",".toAddCard",function(){
-      // alert("绑定社保卡");
-      // window.location.href = "/tjbb.html";
+      var bindno=$(this).attr("bindno");
+      var toPage={"type":"page", "page":"bindTreatCard","bindno":bindno};
+      var topageSt=JSON.stringify(toPage);
+      console.log(topageSt);
+      window.appInjection.postMessage(topageSt)
     })
     
     // todo 跳转方法未集成
@@ -131,9 +142,6 @@
       makeDom()
       if(lists){
         initSwiper()
-      }
-      else{
-      
       }
       
       // 设置滑块
@@ -170,6 +178,7 @@
         dataNodom.innerText= lists[index].fchildno;
         datedom.innerText= lists[index].birth;
         withInsurancedom.innerText= (lists[index].withInsurance)?'社保已关联':'社保未关联';
+        $("#withInsurance").attr("bindno",lists[index].bindno);
         if(!lists[index].withInsurance){
            $('#withInsurance').addClass("toAddCard");
         }
