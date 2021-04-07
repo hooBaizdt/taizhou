@@ -128,7 +128,13 @@
     })
     $(".ym-c-head").on("click",".toAddCard",function(){
       var bindno=$(this).attr("bindno");
-      var toPage={"type":"page", "page":"bindTreatCard","bindno":bindno};
+      var toPage= {
+          "type": "page",
+          "page": "bindTreatCard",
+          "data": {
+            "bindno": bindno
+          }
+        }
       var topageSt=JSON.stringify(toPage);
       console.log(topageSt);
       window.appInjection.postMessage(topageSt)

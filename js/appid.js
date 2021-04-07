@@ -18,14 +18,14 @@
     $.getServiceUrl={
 		getUrl:function(urlName){
 			var obj={
-				// token:"http://test.jktz.gov.cn:8083/clientgateway/huidaoocauth/app/token",//获取token
-				// url: "http://test.jktz.gov.cn:8083/clientgateway/", //获取接口
-				// ymfa:"http://test.jktz.gov.cn:8083/ignore/queryJzjh.service",
-				// ymfaDetail:"http://test.jktz.gov.cn:8083/ignore/queryYmxq.service",
-				token:"apis/clientgateway/huidaoocauth/app/token",//获取token
-				url: "apis/clientgateway/", //获取接口
-				ymfa:"api/ignore/queryJzjh.service",
-				ymfaDetail:"api/ignore/queryYmxq.service",
+				token:"http://test.jktz.gov.cn:8083/clientgateway/huidaoocauth/app/token",//获取token
+				url: "http://test.jktz.gov.cn:8083/clientgateway/", //获取接口
+				ymfa:"http://test.jktz.gov.cn:8083/ignore/queryJzjh.service",
+				ymfaDetail:"http://test.jktz.gov.cn:8083/ignore/queryYmxq.service",
+				// token:"apis/clientgateway/huidaoocauth/app/token",//获取token
+				// url: "apis/clientgateway/", //获取接口
+				// ymfa:"api/ignore/queryJzjh.service",
+				// ymfaDetail:"api/ignore/queryYmxq.service",
 			}
 			return obj[urlName];
 		}
