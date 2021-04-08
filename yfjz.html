@@ -39,14 +39,18 @@
 <script src="js/getTime.js"></script>
 <script src="js/sha1.js"></script>
 <script src="js/appid.js"></script>
+<script src="js/base64.js"></script>
 <script>
   window.onload = function () {
     var timestamp;	
     var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
     var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
     var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
-    var member_num = $.getUrlParma.getparma('memberNum'); 
-    var accessToken = $.getUrlParma.getparma('accessToken');
+    var member_numBase= $.getUrlParma.getparma('memberNum'); 
+    var accessTokenBase = $.getUrlParma.getparma('accessToken');
+    var base = new Base64();  
+    var member_num =base.decode(member_numBase);
+    var accessToken=base.decode(accessTokenBase);
 
     gettime();
     function gettime(){
