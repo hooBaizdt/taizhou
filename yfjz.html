@@ -10,19 +10,39 @@
     <link href="https://cdn.bootcss.com/Swiper/4.3.0/css/swiper.min.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/Swiper/4.3.0/js/swiper.min.js"></script>
     <title>预防接种</title>
+    <style>
+      .ym-c-btn .c-b-fill{
+        display: none;
+      }
+    
+      .layui-layer-btn{
+        background: #FF9A00;
+      }
+      .layui-layer-btn .layui-layer-btn0 {
+          display: block;
+          width: 100%;
+        text-align: center;
+        background: #FF9A00!important;
+        border: none;
+        padding-top: 5px;
+      }
+
+    </style>
 </head>
 <body>
 <section class="ym-child">
     <div class="ym-c-head">
         <div class="c-list">
             <div class="swiper-container">
-                <div class="swiper-wrapper"></div>
+                <div class="swiper-wrapper">
+                    <div class='swiper-slide add'><a class='c-l-current'><img src='images/ym_add_child.png'></a></div>
+                </div>
             </div>
         </div>
         <div class="c-info">
             <h3><span id="name"></span><i id="gender"></i><a id="age"></a></h3>
             <p ><span>出生日期</span><em id="date">暂无信息</em></p>
-            <p ><span>社保信息</span><a  id="withInsurance">暂无信息</a></p>
+            <!-- <p ><span>社保信息</span><a  id="withInsurance">暂无信息</a></p> -->
             <p ><span>母亲姓名</span><em id="motherName">暂无信息</em></p>
             <p ><span>档案编号</span><em id="dataNo">暂无信息</em></p>
         </div>
@@ -40,18 +60,23 @@
 <script src="js/sha1.js"></script>
 <script src="js/appid.js"></script>
 <script src="js/base64.js"></script>
+<script src="layer/layer.js"></script>
 <script>
   window.onload = function () {
     var timestamp;	
-    var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
-    var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
-    var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
+    // var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
+    // var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
+    // var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
+     // 正式
+    var app_ID="b2f09b0a-5df7-41d8-97fe-770f2e84b97b";
+    var app_KEY="d257d738-7c17-4e8e-a903-13dcd4521512";
+    var signaturekey="c6d4260e-c848-47d3-b42c-8c58c392e2e5";
+    
     var member_numBase= $.getUrlParma.getparma('memberNum'); 
     var accessTokenBase = $.getUrlParma.getparma('accessToken');
     var base = new Base64();  
     var member_num =base.decode(member_numBase);
     var accessToken=base.decode(accessTokenBase);
-
     gettime();
     function gettime(){
       timestamp = Math.round(new Date() / 1000)
@@ -68,7 +93,8 @@
       }
       var thisTime;
       $.ajax({
-            url:  $.getServiceUrl.getUrl("token"),
+            url:"http://service.jktz.gov.cn/clientgateway/huidaoocauth/app/token",
+            // url:$.getServiceUrl.getUrl("token"),
             type: "GET",
             datatype: "json",
             contentType: "application/json; charset=utf-8",
@@ -110,12 +136,31 @@
                   mainSwiper(lists)
                 },
                 error: function(data) {
-                  console.log("接口请求失败");
+                  layer.open({
+                    title: [
+                    '温馨提示',
+                    ]
+                    ,shadeClose: true
+                    ,content: '服务调用失败！'
+                    ,btn: [
+                      '确定',
+                    ]
+                  });
+                  
                 }
           })
         },
             error: function(data) {
-                console.log("接口请求失败");
+              layer.open({
+                    title: [
+                    '温馨提示',
+                    ]
+                    ,shadeClose: true
+                    ,content: '服务调用失败！'
+                    ,btn: [
+                      '确定',
+                    ]
+                  });
             }
         })
     }
@@ -140,7 +185,6 @@
           }
         }
       var topageSt=JSON.stringify(toPage);
-      console.log(topageSt);
       window.appInjection.postMessage(topageSt)
     })
     
@@ -151,7 +195,13 @@
     function mainSwiper (lists) {
       makeDom()
       if(lists){
-        initSwiper()
+        var index=sessionStorage.activeIndex;
+        if(index){
+          initSwiper(index)
+        }else{
+          initSwiper('0')
+        }
+        
       }
       
       // 设置滑块
@@ -159,6 +209,7 @@
         var html = ''
         var wrap = document.querySelector('.swiper-wrapper')
         if(lists){
+            $(".c-b-fill").css("display","inline-block");
            lists.forEach(function (item) {
               html+= "<div class='swiper-slide'><a class='c-l-current'><img src='images/head-s@3x.png'></a></div>"
             })
@@ -166,7 +217,7 @@
             wrap.innerHTML=html
         }
         else{
-            $(".c-b-fill").hide();
+           
             html+="<div class='swiper-slide add'><a class='c-l-current'><img src='images/ym_add_child.png'></a></div>"
             wrap.innerHTML=html
           
@@ -180,18 +231,18 @@
         var agedom = document.querySelector('#age');
         var motherNamedom = document.querySelector('#motherName');
         var dataNodom = document.querySelector('#dataNo')
-        var withInsurancedom = document.querySelector('#withInsurance');
+        // var withInsurancedom = document.querySelector('#withInsurance');
         var genderdom = document.querySelector('#gender');
         namedom.innerText= lists[index].name;
-        agedom.innerText= getBetween(lists[index].birth) + '月龄';
+        agedom.innerText= getBetween(lists[index].birth);
         motherNamedom.innerText= lists[index].mothername;
         dataNodom.innerText= lists[index].fchildno;
         datedom.innerText= lists[index].birth;
-        withInsurancedom.innerText= (lists[index].withInsurance)?'社保已关联':'社保未关联';
-        $("#withInsurance").attr("bindno",lists[index].bindno);
-        if(!lists[index].withInsurance){
-           $('#withInsurance').addClass("toAddCard");
-        }
+        // withInsurancedom.innerText= (lists[index].withInsurance)?'社保已关联':'社保未关联';
+        // $("#withInsurance").attr("bindno",lists[index].bindno);
+        // if(!lists[index].withInsurance){
+        //    $('#withInsurance').addClass("toAddCard");
+        // }
         genderdom.className= lists[index].sex=="男"?'c-i-m':'c-i-f';
 
       }
@@ -221,22 +272,41 @@
         var nowAge = nowYear*12 + nowMonth;
         var dateAge = dateYear*12 + dateMonth;
         var age=nowAge-dateAge;
-        return age;
+        var year= Math.floor(age/12);
+        var month=age%12;
+        var thisAge;
+        if(year<1){
+          thisAge=age+"月龄"
+        }
+        else{
+          if(month!=0){
+            thisAge=year+"周岁"+month+"个月"
+          }
+          else{
+            thisAge=year+"周岁"
+          }
+        }
+			
+			return thisAge;
       }
       //初始化 swiper
-      function initSwiper(){
+      function initSwiper(index){
         var domListArray = [].slice.call(document.querySelectorAll('.swiper-slide'))
         var mySwiper = new Swiper('.swiper-container', {
           effect: 'coverflow',
           observer:true,
+          initialSlide:index,
           coverflowEffect: {
             rotate: 0,
             stretch: -20,
             depth: 1000,
             modifier: 1,
-            slideShadows: false
+            slideShadows: false,
           },
           on:{
+            touchMove(){
+              sessionStorage.activeIndex=this.activeIndex
+            },
             init(){
               initShow()
               chooseUserInfo(this.activeIndex)
@@ -253,15 +323,15 @@
               if(domListArray.length > 2)
               {
                 if(this.activeIndex ===  domListArray.length -2){
-                  this.allowSlideNext = false
+                  this.allowSlideNext = true;
                 }
                 else
                 {
-                  this.allowSlideNext = true
+                  this.allowSlideNext = true;
                 }
               }
               else {
-                this.allowSlideNext = false
+                this.allowSlideNext = false;
               }
             },
             transitionStart:function () {
@@ -287,7 +357,7 @@
           {
             domListArray.forEach(function (item,index) {
               item.style.opacity= 1
-              if(index >=2)
+              if(index >2)
               {
                 item.style.opacity= 0
               }

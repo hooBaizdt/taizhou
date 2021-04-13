@@ -10,6 +10,19 @@
 <link rel="stylesheet" href="mobileSelect/lib/mobileSelect.css">
 <script type="text/javascript" src="mobileSelect/lib/mobileSelect.js"></script>
 <title>添加宝宝</title>
+<style>
+.layui-layer-btn{
+	background: #FF9A00;
+}
+.layui-layer-btn .layui-layer-btn0 {
+    display: block;
+    width: 100%;
+	text-align: center;
+	background: #FF9A00!important;
+	border: none;
+	padding-top: 5px; 
+}
+</style>
 </head>
 <body>
 <h3 class="form-remark">完善孩子资料，享受更多服务</h3>
@@ -94,10 +107,17 @@ $.selectDate("#select_1",{
 				add()
 			}
 			else{
+
 				layer.open({
-					content: '请填写完整的儿童信息！'
-					,skin: 'msg'
-				  });
+					title: [
+					'温馨提示',
+					]
+					,shadeClose: true
+					,content: '请填写完整的儿童信息！'
+					,btn: [
+						'确定',
+					]
+				});
 			}
 
 			function add(){
@@ -146,28 +166,64 @@ $.selectDate("#select_1",{
 						success: function(data) {
 							if(data.err_code="FAIL"){
 								layer.open({
-									content: data.err_code_des
-									,skin: 'msg'
-							   });
+									title: [
+									'温馨提示',
+									]
+									,shadeClose: true
+									,content: data.err_code_des
+									,btn: [
+										'确定',
+									]
+			
+								});
+								
 							}
 							else{
 								layer.open({
-									content: "添加成功！"
-									,skin: 'msg'
-							   });
+									title: [
+									'温馨提示',
+									]
+									,shadeClose: true
+									,content: "添加宝宝成功！"
+									,btn: [
+										'确定',
+									]
+									,yes: function(){
+										history.go(-1)
+									}
+								});
+					
+
+							  
 							}
 							
 						},
 						error: function(data) {
 							layer.open({
-								content: '接口请求失败！'
-								,skin: 'msg'
-							});
+									title: [
+									'温馨提示',
+									]
+									,shadeClose: true
+									,content: "接口请求失败！"
+									,btn: [
+										'确定',
+									]
+								});
+			
 						}
 					})
 				},
 				error: function(data) {
-					console.log("接口请求失败");
+					layer.open({
+						title: [
+						'温馨提示',
+						]
+						,shadeClose: true
+						,content: "接口请求失败！"
+						,btn: [
+							'确定',
+						]
+					});
 				}
 			})
 			}

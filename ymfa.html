@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="format-detection" content="telephone=no, email=no">
 <link rel="stylesheet" href="css/style.css">
-<title>接种方案</title>
+<title>疫苗方案</title>
 </head>
 
 <body>
@@ -54,6 +54,7 @@
 <script src="js/jquery-1.11.1.min.js"></script>
 <script src="js/template-web.js"></script>
 <script src="js/appid.js"></script>
+<script src="layer/layer.js"></script>
 <script>
 	
 	function indataOne(){
@@ -69,7 +70,16 @@
                     creatListOne(data);
                 },
                 error: function(data) {
-                    console.log("接口请求失败");
+                    layer.open({
+							title: [
+							'温馨提示',
+							]
+							,shadeClose: true
+							,content: '服务调用失败！'
+							,btn: [
+							'确定',
+							]
+						});
                 }
             })
 		
@@ -86,7 +96,16 @@
 				creatListTwo(data);
 			},
 			error: function(data) {
-				console.log("接口请求失败");
+				layer.open({
+							title: [
+							'温馨提示',
+							]
+							,shadeClose: true
+							,content: '服务调用失败！'
+							,btn: [
+							'确定',
+							]
+				});
 			}
 		})
 	}
@@ -120,16 +139,15 @@
 
 
 	 $(".ym-list").on("click",".ymmc",function(){
-		
 		var ymdm=$(this).attr("value");
-		window.location.href = "/ymdetail.html?ymdm="+ymdm;
+		window.location.href = "ymdetail.html?ymdm="+ymdm;
 	 })
 </script>
 <script type="text/html" id="yilei">
     {{each data}}
 	    <tr>
 			<td>{{$value.yl}}</td>
-			<td value={{$value.ymdm}} class="ymmc"><a>{{$value.ymmc}}</a></td>
+			<td class="ymmc" value={{$value.ymdm}}><a>{{$value.ymmc}}</a></td>
 			<td>第{{$value.jc}}剂</td>
 		</tr>
     {{/each}}
@@ -138,7 +156,7 @@
     {{each data}}
            <tr>
 			<td>{{$value.yl}}</td>
-			<td class="ymmc" value={{$value.ymdm}}><a>{{$value.ymmc}}</a></td>
+			<td class="ymmc" value={{$value.ymdm}}><a >{{$value.ymmc}}</a></td>
 			<td>第{{$value.jc}}剂</td>
 		</tr>
     {{/each}}

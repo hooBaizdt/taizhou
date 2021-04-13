@@ -24,10 +24,12 @@
 <script src="js/getTime.js"></script>
 <script src="js/sha1.js"></script>
 <script src="js/appid.js"></script>
+<script src="layer/layer.js"></script>
 <script type="text/html" id="jzjl">
 	{{each inoculationList}}
 		<li>
-			<div class="ym-time"><i class="ym-t-suc"></i><p class="ym-t-nl"></p> 接种时间：<p class="ym-t-rq">{{$value.fshotdated}}
+			<div class="ym-time"><i class="ym-t-suc"></i><p class="ym-t-nl"></p> 接种时间：<p class="ym-t-rq">
+					<!-- {{$value.fshotdated}} -->
 				</p></div>
 			<div class="ym-detail">
 				<div class="ym-d-jt"></div>
@@ -54,9 +56,17 @@
 	  }
 	
 	var timestamp;	
+
+	// 测试
+	// var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
+	// var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
+	// var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
+    // 正式
 	var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
 	var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
 	var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
+	
+
 	var cardNumber =$.getUrlParma.getparma('cardNumber'); 
 	var accessToken =$.getUrlParma.getparma('accessToken'); 
 	var member_num=$.getUrlParma.getparma('member_num'); 
@@ -115,19 +125,86 @@
 					data:JSON.stringify(params),
 					success: function(data) {
 						var res=data.inoculationList;
+						var thisData;
+						var time=[];
+						var age=[];
 						$("#jzjlBox").html(template("jzjl", data));
+						var birth=data.birth;
+						$(res).each(function(i,item){
+							var fshotdated=item.fshotdated;
+							var thisTime=fshotdated.substring(0,10)
+							time.push(thisTime);
+							// console.log(thisTime)
+							age.push(getBetween (birth,thisTime))
+							
+						})
+						var ele=$("#jzjlBox .ym-time");
+						$(ele).each(function(i,item){
+							$(item).find(".ym-t-rq").text(time[i]);
+							$(item).find(".ym-t-nl").text(age[i]);
+						})
 					},
 					error: function(data) {
-						console.log("接口请求失败");
+						layer.open({
+							title: [
+							'温馨提示',
+							]
+							,shadeClose: true
+							,content: '服务调用失败！'
+							,btn: [
+							'确定',
+							]
+						});
 					}
 				})
 			},
 	        error: function(data) {
-	            console.log("接口请求失败");
+	            layer.open({
+                    title: [
+                    '温馨提示',
+                    ]
+                    ,shadeClose: true
+                    ,content: '服务调用失败！'
+                    ,btn: [
+                      '确定',
+                    ]
+                  });
 	        }
 	    })
 	}
 	 setInterval(gettime,7200000);
+	 function getBetween (startTime,endTime) {
+		var startYear=parseInt(startTime.substring(0,4));
+        var startMonth=parseInt(startTime.substring(5,7));
+        var endYear=parseInt(endTime.substring(0,4));
+        var endMonth=parseInt(endTime.substring(5,7));
+        var start = startYear*12 + startMonth;
+        var end = endYear*12 + endMonth;
+		var age=end-start;
+		if(age==0){
+			return "出生时";
+		}else{
+
+			var year= Math.floor(age/12);
+			var month=age%12;
+			var thisAge;
+			
+			if(year<1){
+				thisAge=age+"月龄"
+			}
+			else{
+				if(month!=0){
+					thisAge=year+"周岁"+month+"个月"
+				}
+				else{
+					thisAge=year+"周岁"
+				}
+			}
+			
+			return thisAge;
+		}
+       
+      }
 
 </script>
 
