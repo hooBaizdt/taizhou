@@ -76,9 +76,12 @@ $.selectDate("#select_1",{
 </script>
 <script>
 		var timestamp;	
-		var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
-		var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
-		var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
+		// var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
+		// var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
+		// var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
+		var app_ID="b2f09b0a-5df7-41d8-97fe-770f2e84b97b";
+		var app_KEY="d257d738-7c17-4e8e-a903-13dcd4521512";
+		var signaturekey="c6d4260e-c848-47d3-b42c-8c58c392e2e5";
 		var member_num =$.getUrlParma.getparma('member_num'); 
 		var accessToken =$.getUrlParma.getparma('accessToken'); 
 		$(".form-submt").on("click",function(){
@@ -107,16 +110,11 @@ $.selectDate("#select_1",{
 				add()
 			}
 			else{
-
 				layer.open({
-					title: [
-					'温馨提示',
-					]
+					title: ['温馨提示',]
 					,shadeClose: true
 					,content: '请填写完整的儿童信息！'
-					,btn: [
-						'确定',
-					]
+					,btn: ['确定',]
 				});
 			}
 
@@ -164,65 +162,46 @@ $.selectDate("#select_1",{
 						},
 						data:JSON.stringify(params),
 						success: function(data) {
-							if(data.err_code="FAIL"){
+							if(data.result_code=="FAIL"){
 								layer.open({
-									title: [
-									'温馨提示',
-									]
+									title: ['温馨提示',]
 									,shadeClose: true
 									,content: data.err_code_des
-									,btn: [
-										'确定',
-									]
+									,btn: ['确定',]
 			
 								});
 								
 							}
 							else{
 								layer.open({
-									title: [
-									'温馨提示',
-									]
+									title: ['温馨提示',]
 									,shadeClose: true
 									,content: "添加宝宝成功！"
-									,btn: [
-										'确定',
-									]
+									,btn: ['确定',]
 									,yes: function(){
-										history.go(-1)
+										var member_numBase=sessionStorage.jhmyMember_numBase;
+                                        var accessTokenBase=sessionStorage.jhmyAccessTokenBase;
+										window.location.href = "yfjz.html?memberNum="+member_numBase+"&accessToken="+accessTokenBase;
 									}
 								});
-					
-
-							  
 							}
-							
 						},
 						error: function(data) {
 							layer.open({
-									title: [
-									'温馨提示',
-									]
+									title: ['温馨提示',]
 									,shadeClose: true
 									,content: "接口请求失败！"
-									,btn: [
-										'确定',
-									]
+									,btn: ['确定',]
 								});
-			
 						}
 					})
 				},
 				error: function(data) {
 					layer.open({
-						title: [
-						'温馨提示',
-						]
+						title: ['温馨提示',]
 						,shadeClose: true
 						,content: "接口请求失败！"
-						,btn: [
-							'确定',
-						]
+						,btn: ['确定',]
 					});
 				}
 			})

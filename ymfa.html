@@ -71,15 +71,11 @@
                 },
                 error: function(data) {
                     layer.open({
-							title: [
-							'温馨提示',
-							]
-							,shadeClose: true
-							,content: '服务调用失败！'
-							,btn: [
-							'确定',
-							]
-						});
+						title: ['温馨提示',]
+						,shadeClose: true
+						,content: '服务调用失败！'
+						,btn: ['确定',]
+					});
                 }
             })
 		
@@ -97,14 +93,10 @@
 			},
 			error: function(data) {
 				layer.open({
-							title: [
-							'温馨提示',
-							]
-							,shadeClose: true
-							,content: '服务调用失败！'
-							,btn: [
-							'确定',
-							]
+					title: ['温馨提示',]
+					,shadeClose: true
+					,content: '服务调用失败！'
+					,btn: ['确定',]
 				});
 			}
 		})
@@ -134,9 +126,7 @@
             $("#classOne").hide();
             $("#classTwo").show();
         }
-
 	 })
-
 
 	 $(".ym-list").on("click",".ymmc",function(){
 		var ymdm=$(this).attr("value");

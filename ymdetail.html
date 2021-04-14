@@ -57,7 +57,12 @@
                     $(".zysx").html(res.zysx);
                 },
                 error: function(data) {
-                    console.log("接口请求失败");
+                    layer.open({
+                        title: ['温馨提示',]
+                        ,shadeClose: true
+                        ,content: '服务调用失败！'
+                        ,btn: ['确定', ]
+                    });
                 }
             })
 

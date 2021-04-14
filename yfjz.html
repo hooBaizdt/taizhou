@@ -51,7 +51,6 @@
         <a class="c-b-fill">接种记录</a><a  class="c-b-line">接种方案</a>
     </div>
 </section>
-
 </body>
 </html>
 <script src="js/jquery-1.11.1.min.js"></script>
@@ -67,13 +66,14 @@
     // var app_ID="5f45d0c6-466a-49ca-87f6-aa3075895d47";
     // var app_KEY="8f3351fb-81eb-46fa-840f-08d7af53c34a";
     // var signaturekey="70801a91-0330-4661-9f12-22f299596e07";
-     // 正式
+    // 正式
     var app_ID="b2f09b0a-5df7-41d8-97fe-770f2e84b97b";
     var app_KEY="d257d738-7c17-4e8e-a903-13dcd4521512";
     var signaturekey="c6d4260e-c848-47d3-b42c-8c58c392e2e5";
-    
     var member_numBase= $.getUrlParma.getparma('memberNum'); 
     var accessTokenBase = $.getUrlParma.getparma('accessToken');
+    sessionStorage.jhmyMember_numBase=member_numBase;
+    sessionStorage.jhmyAccessTokenBase=accessTokenBase;
     var base = new Base64();  
     var member_num =base.decode(member_numBase);
     var accessToken=base.decode(accessTokenBase);
@@ -93,8 +93,8 @@
       }
       var thisTime;
       $.ajax({
-            url:"http://service.jktz.gov.cn/clientgateway/huidaoocauth/app/token",
-            // url:$.getServiceUrl.getUrl("token"),
+            // url:"http://service.jktz.gov.cn/clientgateway/huidaoocauth/app/token",
+            url:$.getServiceUrl.getUrl("token"),
             type: "GET",
             datatype: "json",
             contentType: "application/json; charset=utf-8",
@@ -132,36 +132,29 @@
                 },
                 data:JSON.stringify(params),
                 success: function(data) {
+                  console.log(data);
                   var lists=data.bindList;
                   mainSwiper(lists)
                 },
-                error: function(data) {
+                error: function() {
                   layer.open({
-                    title: [
-                    '温馨提示',
-                    ]
+                    title: ['温馨提示',]
                     ,shadeClose: true
                     ,content: '服务调用失败！'
-                    ,btn: [
-                      '确定',
-                    ]
+                    ,btn: ['确定',]
                   });
                   
                 }
-          })
+            })
         },
-            error: function(data) {
-              layer.open({
-                    title: [
-                    '温馨提示',
-                    ]
-                    ,shadeClose: true
-                    ,content: '服务调用失败！'
-                    ,btn: [
-                      '确定',
-                    ]
-                  });
-            }
+        error: function() {
+          layer.open({
+                title: ['温馨提示',]
+                ,shadeClose: true
+                ,content: '服务调用失败！'
+                ,btn: ['确定',]
+              });
+        }
         })
     }
      setInterval(gettime,7200000);
@@ -208,7 +201,8 @@
       function makeDom () {
         var html = ''
         var wrap = document.querySelector('.swiper-wrapper')
-        if(lists){
+       
+        if( lists.length!=0){
             $(".c-b-fill").css("display","inline-block");
            lists.forEach(function (item) {
               html+= "<div class='swiper-slide'><a class='c-l-current'><img src='images/head-s@3x.png'></a></div>"
@@ -217,10 +211,8 @@
             wrap.innerHTML=html
         }
         else{
-           
             html+="<div class='swiper-slide add'><a class='c-l-current'><img src='images/ym_add_child.png'></a></div>"
             wrap.innerHTML=html
-          
         }
        
       }
